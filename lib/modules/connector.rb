@@ -25,7 +25,6 @@ module BoredContext
       rescue JSON::ParserError
         puts "ERROR: Recived invalid JSON"
       else
-        # Activity.new if  body_data["participants"] == 1
         Activity.new(body_data)
       end
     end
@@ -37,9 +36,6 @@ module BoredContext
 
     @count = 0
 
-    # def initialize
-    #   @count += 1
-    # end
     def initialize(params)
       @activity = params
       p "Activity params"
@@ -48,40 +44,29 @@ module BoredContext
       p params["participants"]
       handle_counter(params)
     end
+
     #
     def handle_counter(params)
       if params["participants"] == 1
         Counter.new
-        # p @count
-        # @count += 1
       end
     end
-    #
-    # def Activity.get_count
-    #   @count
-    # end
+
   end
 
-class Counter
-  attr_accessor :count
+  class Counter
+    attr_accessor :count
 
-  # def initialize
-  #   if @count.nil?
-  #     @count = 1
-  #   else
-  #     @count += 1
-  #   end
-  # end
-  @@activity_count = 0
+    @@activity_count = 0
 
-  def initialize
-    @@activity_count += 1
+    def initialize
+      @@activity_count += 1
+    end
+
+    def self.count
+      @@activity_count
+    end
   end
-
-  def self.count
-    @@activity_count
-  end
-end
 
   connector = Connector.new("https://www.boredapi.com/api/activity", 5)
   connector.make_get_request
