@@ -11,36 +11,83 @@ module BoredContext
       @request_number = request_number
     end
 
-    # Connection to URL
-    # In every step it should create Activity
     def make_get_request
       @request_number.times do
         response = HTTParty.get(@url)
-        p response.body
+
+        handle_data_for_activity(response.body)
+      end
+    end
+
+    def handle_data_for_activity(response_body)
+      begin
+        body_data = JSON.parse(response_body)
+      rescue JSON::ParserError
+        puts "ERROR: Recived invalid JSON"
+      else
+        # Activity.new if  body_data["participants"] == 1
+        Activity.new(body_data)
       end
     end
   end
 
 
   class Activity
-    # def initiliaze
-    #   #When variable     "participants": 1,
-    #   # call counter
-    #   # if not return
-    #   # end
+    attr_accessor :count
+
+    @count = 0
+
+    # def initialize
+    #   @count += 1
+    # end
+    def initialize(params)
+      @activity = params
+      p "Activity params"
+      p @activity
+      p "Participants:"
+      p params["participants"]
+      handle_counter(params)
+    end
+    #
+    def handle_counter(params)
+      if params["participants"] == 1
+        Counter.new
+        # p @count
+        # @count += 1
+      end
+    end
+    #
+    # def Activity.get_count
+    #   @count
     # end
   end
 
-  class Counter
-    # @@count
-  end
-  connector = Connector.new("https://www.boredapi.com/api/activity", 5)
-  connector.make_get_request
+class Counter
+  attr_accessor :count
 
+  # def initialize
+  #   if @count.nil?
+  #     @count = 1
+  #   else
+  #     @count += 1
+  #   end
+  # end
+  @@activity_count = 0
+
+  def initialize
+    @@activity_count += 1
+  end
+
+  def self.count
+    @@activity_count
+  end
 end
 
-
-#TODO here it should take connection to bored api
+  connector = Connector.new("https://www.boredapi.com/api/activity", 5)
+  connector.make_get_request
+  p "Number of activities with participant number equal to 1 is:"
+  p Counter.count
+end
 
 
 
